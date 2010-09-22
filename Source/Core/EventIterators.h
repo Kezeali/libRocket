@@ -104,6 +104,12 @@ public:
 		elements.push_back(v);
 		return *this;
 	}
+
+	RKTOutputIterator &operator=(const RKTOutputIterator<T> &other) 
+	{
+		elements = other.elements;
+		return *this;
+	}
 	
 	RKTOutputIterator &operator *()
 	{ 

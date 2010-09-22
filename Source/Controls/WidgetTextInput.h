@@ -82,6 +82,21 @@ public:
 	/// Returns the input element's maximum allowed text dimensions.
 	const Rocket::Core::Vector2f& GetTextDimensions() const;
 
+	/// Returns the absolute index of the cursor.
+	int GetCursorIndex() const;
+	/// Sets the absolute index of the cursor
+	/// @param[in] index The index to set the cursor to.
+	/// @param[in] scroll_to_cursor True to scroll to show the cursor position, false to not scroll.
+	void SetCursorIndex(int index, bool scroll_to_cursor = true);
+	/// Shows or hides the cursor.
+	/// @param[in] show True to show the cursor, false to hide it.
+	/// @param[in] scroll_to_cursor True to force the cursor to be visible, false to not scroll the widget.
+	void ShowCursor(bool show, bool scroll_to_cursor = true);
+	/// Scrolls the element to show the cursor.
+	void ScrollToCursor();
+	/// Returns the position at which the cursor is rendered relative to the client area
+	const Rocket::Core::Vector2f& GetCursorPosition() const;
+
 protected:
 	/// Processes the "keydown" and "textinput" event to write to the input field, and the "focus" and
 	/// "blur" to set the state of the cursor.
@@ -102,14 +117,14 @@ protected:
 	/// Called when the user pressed enter.
 	virtual void LineBreak() = 0;
 
-	/// Returns the absolute index of the cursor.
-	int GetCursorIndex() const;
-
 	/// Gets the parent element containing the widget.
 	Core::Element* GetElement();
 
 	/// Dispatches a change event to the widget's element.
 	void DispatchChangeEvent();
+
+	/// Dispatches an enter event to the widget's element.
+	void DispatchEnterEvent();
 
 private:
 	/// Moves the cursor along the current line.
@@ -135,11 +150,6 @@ private:
 	/// @param[in] position The position to query.
 	/// @return The index of the character under the mouse cursor.
 	int CalculateCharacterIndex(int line_index, float position);
-
-	/// Shows or hides the cursor.
-	/// @param[in] show True to show the cursor, false to hide it.
-	/// @param[in] move_to_cursor True to force the cursor to be visible, false to not scroll the widget.
-	void ShowCursor(bool show, bool move_to_cursor = true);
 
 	/// Formats the element, laying out the text and inserting scrollbars as appropriate.
 	void FormatElement();

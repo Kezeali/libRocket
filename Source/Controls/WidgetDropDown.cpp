@@ -38,6 +38,7 @@ namespace Rocket {
 namespace Controls {
 
 WidgetDropDown::WidgetDropDown(ElementFormControl* element)
+: reversed(false)
 {
 	parent_element = element;
 
@@ -122,6 +123,16 @@ void WidgetDropDown::OnLayout()
 	value_layout_dirty = true;
 }
 
+void WidgetDropDown::SetReversed(bool reverse)
+{
+	reversed = reverse;
+}
+
+bool WidgetDropDown::IsReversed() const
+{
+	return reversed;
+}
+
 // Sets the value of the widget.
 void WidgetDropDown::SetValue(const Rocket::Core::String& _value)
 {
@@ -204,13 +215,24 @@ int WidgetDropDown::AddOption(const Rocket::Core::String& rml, const Rocket::Cor
 	if (before < 0 ||
 		before >= (int) options.size())
 	{
-		selection_element->AppendChild(element);
+		if (IsReversed())
+			selection_element->InsertBefore(element, selection_element->GetFirstChild());
+		else
+			selection_element->AppendChild(element);
 		options.push_back(SelectOption(element, value, selectable));
 		option_index = (int) options.size() - 1;
 	}
 	else
 	{
-		selection_element->InsertBefore(element, selection_element->GetChild(before));
+		if (IsReversed())
+		{
+			if (before == 0)
+				selection_element->AppendChild(element);
+			else
+				selection_element->InsertBefore(element, options[before-1].GetElement());
+		}
+		else
+			selection_element->InsertBefore(element, selection_element->GetChild(before));
 		options.insert(options.begin() + before, SelectOption(element, value, selectable));
 		option_index = before;
 	}

@@ -61,6 +61,13 @@ public:
 	/// @return The current value of the widget.
 	const Rocket::Core::String& GetValue() const;
 
+	/// Enables or disables reversed layout.
+	/// @param[in] reverse True to reverse layout, false for normal layout.
+	void SetReversed(bool reverse);
+	/// Returns the layout ordering mode of this field.
+	/// @return True if this field is reverse-ordered, false otherwise.
+	bool IsReversed() const;
+
 	/// Sets the index of the selection. If the new index lies outside of the bounds, the selection index will be set to -1.
 	/// @param[in] selection The new selection index.
 	/// @param[in] force Forces the new selection, even if the widget believes the selection to not have changed.
@@ -107,6 +114,9 @@ private:
 	Core::Element* button_element;
 	Core::Element* selection_element;
 	Core::Element* value_element;
+
+	// Reverse layout adds the drop-down elements to the menu in reverse order (so the highest index is at the top)
+	bool reversed;
 
 	// The options in the drop down.
 	OptionList options;

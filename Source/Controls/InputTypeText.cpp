@@ -83,6 +83,8 @@ bool InputTypeText::OnAttributeChange(const Core::AttributeNameList& changed_att
 	// Check if the value has been changed.
 	if (changed_attributes.find("value") != changed_attributes.end())
 		widget->SetValue(element->GetAttribute< Rocket::Core::String >("value", ""));
+	if (changed_attributes.find("enter_event") != changed_attributes.end())
+		widget->SetEnterEventEnabled(element->GetAttribute< bool >("enter_event", false));
 
 	return !dirty_layout;
 }

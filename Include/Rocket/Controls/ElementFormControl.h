@@ -74,6 +74,13 @@ public:
 	/// @param[in] disable True to disable the element, false to enable.
 	void SetDisabled(bool disable);
 
+	/// Enables or disables writing to this field.
+	/// @param[in] read_only True to disable writing, false to enable it.
+	void SetReadOnly(bool read_only);
+	/// Returns the writeablity of this field.
+	/// @return True if this field is read-only (not writeable), false otherwise.
+	bool IsReadOnly() const;
+
 protected:
 	/// Checks for changes to the 'disabled' attribute.
 	/// @param[in] changed_attributes List of changed attributes on the element.

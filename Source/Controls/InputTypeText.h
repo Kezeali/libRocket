@@ -33,7 +33,7 @@
 namespace Rocket {
 namespace Controls {
 
-class WidgetTextInput;
+class WidgetTextInputSingleLine;
 
 /**
 	A single-line input type handler.
@@ -78,7 +78,7 @@ public:
 private:
 	int size;
 
-	WidgetTextInput* widget;
+	WidgetTextInputSingleLine* widget;
 };
 
 }

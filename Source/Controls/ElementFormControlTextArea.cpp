@@ -125,6 +125,31 @@ bool ElementFormControlTextArea::GetIntrinsicDimensions(Rocket::Core::Vector2f& 
 	return true;
 }
 
+int ElementFormControlTextArea::GetCursorIndex() const
+{
+	return widget->GetCursorIndex();
+}
+
+void ElementFormControlTextArea::SetCursorIndex(int index, bool scroll_to_cursor)
+{
+	widget->SetCursorIndex(index, scroll_to_cursor);
+}
+
+void ElementFormControlTextArea::ShowCursor(bool show, bool scroll_to_cursor)
+{
+	widget->ShowCursor(show, scroll_to_cursor);
+}
+
+void ElementFormControlTextArea::ScrollToCursor()
+{
+	widget->ScrollToCursor();
+}
+
+const Rocket::Core::Vector2f &ElementFormControlTextArea::GetCursorPosition() const
+{
+	return widget->GetCursorPosition();
+}
+
 // Updates the control's widget.
 void ElementFormControlTextArea::OnUpdate()
 {

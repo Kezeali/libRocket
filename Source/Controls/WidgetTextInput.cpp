@@ -224,6 +224,40 @@ const Rocket::Core::Vector2f& WidgetTextInput::GetTextDimensions() const
 	return internal_dimensions;
 }
 
+void WidgetTextInput::SetCursorIndex(int index, bool scroll_to_cursor)
+{
+	// TODO: fix this (new UpdateXXXCursor fn which updates the relative cursor from the edit index)
+	absolute_cursor_index = index;
+
+	UpdateRelativeCursor();
+
+	if (scroll_to_cursor)
+		ScrollToCursor();
+}
+
+void WidgetTextInput::ScrollToCursor()
+{
+	float minimum_scroll_top = (cursor_position.y + cursor_size.y) - parent->GetClientHeight();
+	if (parent->GetScrollTop() < minimum_scroll_top)
+		parent->SetScrollTop(minimum_scroll_top);
+	else if (parent->GetScrollTop() > cursor_position.y)
+		parent->SetScrollTop(cursor_position.y);
+
+	float minimum_scroll_left = (cursor_position.x + cursor_size.x) - parent->GetClientWidth();
+	if (parent->GetScrollLeft() < minimum_scroll_left)
+		parent->SetScrollLeft(minimum_scroll_left);
+	else if (parent->GetScrollLeft() > cursor_position.x)
+		parent->SetScrollLeft(cursor_position.x);
+
+	scroll_offset.x = parent->GetScrollLeft();
+	scroll_offset.y = parent->GetScrollTop();
+}
+
+const Rocket::Core::Vector2f& WidgetTextInput::GetCursorPosition() const
+{
+	return cursor_position;
+}
+
 // Gets the parent element containing the widget.
 Core::Element* WidgetTextInput::GetElement()
 {
@@ -236,6 +270,14 @@ void WidgetTextInput::DispatchChangeEvent()
 	Rocket::Core::Dictionary parameters;
 	parameters.Set("value", GetElement()->GetAttribute< Rocket::Core::String >("value", ""));
 	GetElement()->DispatchEvent("change", parameters);
+}
+
+// Dispatches an enter event to the widget's element.
+void WidgetTextInput::DispatchEnterEvent()
+{
+	Rocket::Core::Dictionary parameters;
+	parameters.Set("value", GetElement()->GetAttribute< Rocket::Core::String >("value", ""));
+	GetElement()->DispatchEvent("enter", parameters);
 }
 
 // Processes the "keydown" and "textinput" event to write to the input field, and the "focus" and "blur" to set
@@ -267,17 +309,44 @@ void WidgetTextInput::ProcessEvent(Core::Event& event)
 			case Core::Input::KI_DOWN:		MoveCursorVertical(1, shift); break;
 
 			case Core::Input::KI_NUMPAD7:	if (numlock) break;
-			case Core::Input::KI_HOME:		MoveCursorHorizontal(-cursor_character_index, shift); break;
+			case Core::Input::KI_HOME:
+				if (ctrl)
+				{
+					cursor_line_index = 0;
+					cursor_character_index = 0;
+					UpdateAbsoluteCursor();
+					UpdateCursorPosition();
+					UpdateSelection(shift);
+					ShowCursor(true, true);
+				}
+				else
+					MoveCursorHorizontal(-cursor_character_index, shift);
+				break;
 
 			case Core::Input::KI_NUMPAD1:	if (numlock) break;
-			case Core::Input::KI_END:		MoveCursorHorizontal(lines[cursor_line_index].content_length - cursor_character_index, shift); break;
+			case Core::Input::KI_END:
+				if (ctrl)
+				{
+					cursor_line_index = lines.size()-1;
+					cursor_character_index = lines[lines.size()-1].content_length;
+					UpdateAbsoluteCursor();
+					UpdateCursorPosition();
+					UpdateSelection(shift);
+					ShowCursor(true, true);
+				}
+				else
+					MoveCursorHorizontal(lines[cursor_line_index].content_length - cursor_character_index, shift);
+				break;
 
 			case Core::Input::KI_BACK:
 			{
-				if (DeleteCharacter(true))
+				if (!parent->IsReadOnly())
 				{
-					FormatElement();
-					UpdateRelativeCursor();
+					if (DeleteCharacter(true))
+					{
+						FormatElement();
+						UpdateRelativeCursor();
+					}
 				}
 
 				ShowCursor(true);
@@ -287,10 +356,14 @@ void WidgetTextInput::ProcessEvent(Core::Event& event)
 			case Core::Input::KI_DECIMAL:	if (numlock) break;
 			case Core::Input::KI_DELETE:
 			{
-				if (DeleteCharacter(false))
+				// Delete only when not read-only
+				if (!parent->IsReadOnly())
 				{
-					FormatElement();
-					UpdateRelativeCursor();
+					if (DeleteCharacter(false))
+					{
+						FormatElement();
+						UpdateRelativeCursor();
+					}
 				}
 
 				ShowCursor(true);
@@ -316,14 +389,17 @@ void WidgetTextInput::ProcessEvent(Core::Event& event)
                 if (ctrl)
                 {
                     CopySelection();
-                    DeleteSelection();
+					// In read-only mode, cut acts like copy
+					if (!parent->IsReadOnly())
+                    	DeleteSelection();
                 }
 			}
 			break;
 
 			case Core::Input::KI_V:
 			{
-                if (ctrl)
+				// Pasting is disabled in read-only mode
+                if (ctrl && !parent->IsReadOnly())
                 {
     				const Core::WString clipboard_content = Clipboard::Get();
     				for (size_t i = 0; i < clipboard_content.Length(); ++i)
@@ -352,8 +428,9 @@ void WidgetTextInput::ProcessEvent(Core::Event& event)
 	}
 	else if (event == "textinput")
 	{
-		// Only process the text if no modifier keys are pressed.
-		if (event.GetParameter< int >("ctrl_key", 0) == 0 &&
+		// Only process the text if writing is enabled and no modifier keys are pressed.
+		if (!parent->IsReadOnly() &&
+			event.GetParameter< int >("ctrl_key", 0) == 0 &&
 			event.GetParameter< int >("alt_key", 0) == 0 &&
 			event.GetParameter< int >("meta_key", 0) == 0)
 		{
@@ -634,20 +711,7 @@ void WidgetTextInput::ShowCursor(bool show, bool move_to_cursor)
 		// Shift the cursor into view.
 		if (move_to_cursor)
 		{
-			float minimum_scroll_top = (cursor_position.y + cursor_size.y) - parent->GetClientHeight();
-			if (parent->GetScrollTop() < minimum_scroll_top)
-				parent->SetScrollTop(minimum_scroll_top);
-			else if (parent->GetScrollTop() > cursor_position.y)
-				parent->SetScrollTop(cursor_position.y);
-
-			float minimum_scroll_left = (cursor_position.x + cursor_size.x) - parent->GetClientWidth();
-			if (parent->GetScrollLeft() < minimum_scroll_left)
-				parent->SetScrollLeft(minimum_scroll_left);
-			else if (parent->GetScrollLeft() > cursor_position.x)
-				parent->SetScrollLeft(cursor_position.x);
-
-			scroll_offset.x = parent->GetScrollLeft();
-			scroll_offset.y = parent->GetScrollTop();
+			ScrollToCursor();
 		}
 	}
 	else

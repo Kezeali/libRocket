@@ -49,6 +49,9 @@ public:
 	/// @param value[in] The new value to set on the text field.
 	virtual void SetValue(const Core::String& value);
 
+	void SetEnterEventEnabled(bool enabled);
+	bool IsEnterEventEnabled() const;
+
 protected:
 	/// Returns true if the given character is permitted in the input field, false if not.
 	/// @param[in] character The character to validate.
@@ -59,6 +62,8 @@ protected:
 
 	/// Strips all \n and \r characters from the string.
 	void SanitiseValue(Core::String& value);
+
+	bool enter_event_enabled;
 };
 
 }

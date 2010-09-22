@@ -75,6 +75,26 @@ void ElementFormControl::SetDisabled(bool disable)
 		RemoveAttribute("disabled");
 }
 
+// Returns the writeability in the text area.
+bool ElementFormControl::IsReadOnly() const
+{
+	// Check that there is a read-only attribute at all
+	if (GetAttribute("readonly") == NULL) // Can't use HasAttribute() here because it is inexpliably a non-const method
+		return false;
+	// Check for a boolean value (which I think is more sensible), then the html-style value (readonly='readonly')
+	//  So the posible values which return 'true' are: readonly, readonly='true' and readonly='readonly'
+	return GetAttribute< bool >("readonly", true) || GetAttribute< Rocket::Core::String >("readonly", "") == "readonly";
+}
+
+// Enables or disables writing in the text area.
+void ElementFormControl::SetReadOnly(bool read_only)
+{
+	if (read_only)
+		SetAttribute("readonly", true);
+	else
+		RemoveAttribute("readonly");
+}
+
 // Checks for changes to the 'disabled' attribute.
 void ElementFormControl::OnAttributeChange(const Core::AttributeNameList& changed_attributes)
 {

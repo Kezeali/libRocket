@@ -49,6 +49,16 @@ void WidgetTextInputSingleLine::SetValue(const Core::String& value)
 	WidgetTextInput::SetValue(new_value);
 }
 
+void WidgetTextInputSingleLine::SetEnterEventEnabled(bool enabled)
+{
+	enter_event_enabled = enabled;
+}
+
+bool WidgetTextInputSingleLine::IsEnterEventEnabled() const
+{
+	return enter_event_enabled;
+}
+
 // Returns true if the given character is permitted in the input field, false if not.
 bool WidgetTextInputSingleLine::IsCharacterValid(Rocket::Core::word character)
 {
@@ -58,7 +68,10 @@ bool WidgetTextInputSingleLine::IsCharacterValid(Rocket::Core::word character)
 // Called when the user pressed enter.
 void WidgetTextInputSingleLine::LineBreak()
 {
-	DispatchChangeEvent();
+	if (enter_event_enabled)
+		DispatchEnterEvent();
+	else
+		DispatchChangeEvent();
 }
 
 // Strips all \n and \r characters from the string.

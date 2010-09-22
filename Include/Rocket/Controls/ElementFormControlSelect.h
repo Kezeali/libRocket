@@ -59,6 +59,13 @@ public:
 	/// @param[in] value The new value of the form control.
 	virtual void SetValue(const Rocket::Core::String& value);
 
+	/// Enables or disables reversed layout.
+	/// @param[in] reverse True to reverse layout, false for normal layout.
+	void SetReversed(bool reverse);
+	/// Returns the writeablity of this field.
+	/// @return True if this field is read-only (not writeable), false otherwise.
+	bool IsReversed() const;
+
 	/// Sets the index of the selection. If the new index lies outside of the bounds, it will be clamped.
 	/// @param[in] selection The new selection index.
 	void SetSelection(int selection);
@@ -96,6 +103,11 @@ protected:
 
 	/// Forces an internal layout.
 	virtual void OnLayout();
+
+	/// Checks for changes to the 'reversed' attribute.
+	/// @param[in] changed_attributes List of changed attributes on the element.
+	virtual void OnAttributeChange(const Core::AttributeNameList& changed_attributes);
+
 
 	/// Returns true to mark this element as replaced.
 	/// @param[out] intrinsic_dimensions Set to the arbitrary dimensions of 128 x 16 just to give this element a size. Resize with the 'width' and 'height' properties.

@@ -93,6 +93,21 @@ public:
 	/// @return True.
 	virtual bool GetIntrinsicDimensions(Rocket::Core::Vector2f& dimensions);
 
+	/// Returns the absolute index of the cursor in the text widget.
+	int GetCursorIndex() const;
+	/// Sets the absolute index of the cursor in the text widget.
+	/// @param[in] index The index to set the cursor to.
+	/// @param[in] scroll_to_cursor True to scroll to show the cursor position, false to not scroll.
+	void SetCursorIndex(int index, bool scroll_to_cursor = true);
+	/// Shows or hides the cursor.
+	/// @param[in] show True to show the cursor, false to hide it.
+	/// @param[in] scroll_to_cursor True to force the cursor to be visible, false to not scroll the widget.
+	void ShowCursor(bool show, bool scroll_to_cursor = true);
+	/// Scrolls the text-area to show the cursor.
+	void ScrollToCursor();
+	/// Returns the position at which the cursor is rendered relative to the client area
+	const Rocket::Core::Vector2f& GetCursorPosition() const;
+
 protected:
 	/// Updates the control's widget.
 	void OnUpdate();

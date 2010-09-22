@@ -61,6 +61,23 @@ void ElementFormControlSelect::SetValue(const Rocket::Core::String& value)
 	widget->SetValue(value);
 }
 
+// Returns the state of word-wrapping in the text area.
+bool ElementFormControlSelect::IsReversed() const
+{
+	return GetAttribute("reversed") != NULL;
+}
+
+// Enables or disables word-wrapping in the text area.
+void ElementFormControlSelect::SetReversed(bool reverse)
+{
+	if (reverse)
+		SetAttribute("reversed", true);
+	else
+		RemoveAttribute("reversed");
+
+	widget->SetReversed(reverse);
+}
+
 // Sets the index of the selection. If the new index lies outside of the bounds, it will be clamped.
 void ElementFormControlSelect::SetSelection(int selection)
 {
@@ -156,6 +173,15 @@ void ElementFormControlSelect::OnRender()
 void ElementFormControlSelect::OnLayout()
 {
 	widget->OnLayout();
+}
+
+// Checks for changes to the 'reversed' attribute.
+void ElementFormControlSelect::OnAttributeChange(const Core::AttributeNameList& changed_attributes)
+{
+	ElementFormControl::OnAttributeChange(changed_attributes);
+
+	if (changed_attributes.find("reversed") != changed_attributes.end())
+		widget->SetReversed(IsReversed());
 }
 
 // Returns true to mark this element as replaced.

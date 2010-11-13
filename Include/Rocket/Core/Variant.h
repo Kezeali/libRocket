@@ -150,7 +150,12 @@ private:
 		void Clear();
 		Type type;
 
-		char data[16];
+#ifdef ROCKET_ARCH_64
+		static const int BUFFER_SIZE = 32;
+#else
+		static const int BUFFER_SIZE = 16;
+#endif
+		char data[BUFFER_SIZE];
 		void* data_ptr;
 
 		mutable int reference_count;

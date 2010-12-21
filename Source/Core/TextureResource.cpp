@@ -92,7 +92,7 @@ void TextureResource::Release(RenderInterface* render_interface)
 		for (TextureDataMap::iterator texture_iterator = texture_data.begin(); texture_iterator != texture_data.end(); ++texture_iterator)
 		{
 			TextureHandle handle = texture_iterator->second.first;
-			if (handle != NULL)
+			if (handle)
 				texture_iterator->first->ReleaseTexture(handle);
 		}
 
@@ -105,7 +105,7 @@ void TextureResource::Release(RenderInterface* render_interface)
 			return;
 
 		TextureHandle handle = texture_iterator->second.first;
-		if (handle != NULL)
+		if (handle)
 			texture_iterator->first->ReleaseTexture(handle);
 
 		texture_data.erase(render_interface);
@@ -130,16 +130,17 @@ bool TextureResource::Load(RenderInterface* render_interface) const
 		{
 			// The requested texture is a font layer.
 			delete_data = true;
-
-			StringList parameters;
-			StringUtilities::ExpandString(parameters, source.Substring(source.Find("::") + 2), '/');
-			if (parameters.size() == 3)
+			
+			FontFaceHandle* handle;
+			FontEffect* layer_id;
+			int texture_id;
+			
+			if (sscanf(source.CString(), "?font::%p/%p/%d", &handle, &layer_id, &texture_id) == 3)
 			{
-				FontFaceHandle* handle = (FontFaceHandle*) strtol(parameters[0].CString(), NULL, 16);
 				handle->GenerateLayerTexture(data,
 											 dimensions,
-											 strtol(parameters[1].CString(), NULL, 16),
-											 atoi(parameters[2].CString()));
+											 layer_id,
+											 texture_id);
 			}
 		}
 

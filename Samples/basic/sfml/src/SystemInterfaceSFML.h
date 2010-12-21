@@ -3,7 +3,7 @@
  *
  * For the latest information, see http://www.librocket.com
  *
- * Copyright (c) 2008-2010 CodePoint Ltd, Shift Technology Ltd
+ * Copyright (c) 2008-2010 Nuno Silva
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,68 +24,23 @@
  * THE SOFTWARE.
  *
  */
+#ifndef SYSTEMINTEFACESFML_H
+#define SYSTEMINTEFACESFML_H
 
-#ifndef ROCKETCOREEVENTITERATORS_H
-#define ROCKETCOREEVENTITERATORS_H
+#include <Rocket/Core/SystemInterface.h>
+#include <Rocket/Core/Input.h>
+#include <SFML/Graphics.hpp>
 
-#include <Rocket/Core/ElementReference.h>
-#include <Rocket/Core/Element.h>
-
-namespace Rocket {
-namespace Core {
-
-/**
-	An STL unary functor for dispatching an event to a Element.
-
-	@author Peter Curry
- */
-
-class RKTEventFunctor
+class RocketSFMLSystemInterface : public Rocket::Core::SystemInterface
 {
 public:
-	RKTEventFunctor(const String& event, const Dictionary& parameters, bool interruptible)
-	{
-		this->event = event;
-		this->parameters = &parameters;
-		this->interruptible = interruptible;
-	}
 
-	void operator()(ElementReference& element)
-	{
-		element->DispatchEvent(event, *parameters, interruptible);
-	}
+	Rocket::Core::Input::KeyIdentifier TranslateKey(sf::Key::Code Key);
+	int GetKeyModifiers(sf::Window *Window);
+	float GetElapsedTime();
+	bool LogMessage(Rocket::Core::Log::Type type, const Rocket::Core::String& message);
 
 private:
-	String event;
-	const Dictionary* parameters;
-	bool interruptible;
+	sf::Clock timer;
 };
-
-/**
-	An STL unary functor for setting or clearing a pseudo-class on a Element.
-
-	@author Pete
- */
-
-class PseudoClassFunctor
-{
-	public:
-		PseudoClassFunctor(const String& pseudo_class, bool set) : pseudo_class(pseudo_class)
-		{
-			this->set = set;
-		}
-
-		void operator()(ElementReference& element)
-		{
-			element->SetPseudoClass(pseudo_class, set);
-		}
-
-	private:
-		String pseudo_class;
-		bool set;
-};
-
-}
-}
-
 #endif

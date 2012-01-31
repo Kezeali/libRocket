@@ -3,7 +3,7 @@
  *
  * For the latest information, see http://www.librocket.com
  *
- * Copyright (c) 2008-2010 CodePoint Ltd, Shift Technology Ltd
+ * Copyright (c) 2008-2010 Nuno Silva
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,45 +24,23 @@
  * THE SOFTWARE.
  *
  */
+#ifndef SYSTEMINTEFACESFML_H
+#define SYSTEMINTEFACESFML_H
 
-#ifndef ROCKETCOREEVENTLISTENERINSTANCER_H
-#define ROCKETCOREEVENTLISTENERINSTANCER_H
+#include <Rocket/Core/SystemInterface.h>
+#include <Rocket/Core/Input.h>
+#include <SFML/Graphics.hpp>
 
-#include <Rocket/Core/ReferenceCountable.h>
-#include <Rocket/Core/String.h>
-#include <Rocket/Core/Header.h>
-#include <Rocket/Core/Element.h>
-
-namespace Rocket {
-namespace Core {
-
-class EventListener;
-
-/**
-	Abstract instancer interface for instancing event listeners. This is required to be overridden for scripting
-	systems.
-
-	@author Lloyd Weehuizen
- */
-
-class ROCKETCORE_API EventListenerInstancer : public ReferenceCountable
+class RocketSFMLSystemInterface : public Rocket::Core::SystemInterface
 {
 public:
-	virtual ~EventListenerInstancer();
 
-	/// Instance an event listener object.
-	/// @param value Value of the event.
-	/// @param element Element that triggers the events.
-	virtual EventListener* InstanceEventListener(const String& value, Element* element) = 0;
+	Rocket::Core::Input::KeyIdentifier TranslateKey(sf::Key::Code Key);
+	int GetKeyModifiers(sf::Window *Window);
+	float GetElapsedTime();
+	bool LogMessage(Rocket::Core::Log::Type type, const Rocket::Core::String& message);
 
-	/// Releases this event listener instancer.
-	virtual void Release() = 0;
-
-protected:
-	virtual void OnReferenceDeactivate();
+private:
+	sf::Clock timer;
 };
-
-}
-}
-
 #endif

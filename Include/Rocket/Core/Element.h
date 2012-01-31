@@ -422,6 +422,9 @@ public:
 	/// Gets the markup and content of the element.
 	/// @param[out] content The content of the element.
 	virtual void GetInnerRML(String& content) const;
+	/// Gets the markup and content of the element.
+	/// @return The content of the element.
+	String GetInnerRML() const;
 	/// Sets the markup and content of the element. All existing children will be replaced.
 	/// @param[in] rml The new content of the element.
 	void SetInnerRML(const String& rml);
@@ -530,6 +533,9 @@ public:
 	/// Called for every event sent to this element or one of its descendants.
 	/// @param[in] event The event to process.
 	virtual void ProcessEvent(Event& event);
+	
+	/// Update the element's layout if required.
+	void UpdateLayout();
 
 protected:
 	/// Forces the element to generate a local stacking context, regardless of the value of its z-index
@@ -558,8 +564,6 @@ protected:
 	// @param[in] child The element that has been removed. This may be this element.
 	virtual void OnChildRemove(Element* child);
 
-	/// Update the element's layout if required.
-	virtual void UpdateLayout();
 	/// Forces a re-layout of this element, and any other elements required.
 	virtual void DirtyLayout();
 

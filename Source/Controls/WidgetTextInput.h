@@ -117,6 +117,9 @@ protected:
 	/// Called when the user pressed enter.
 	virtual void LineBreak() = 0;
 
+	/// Returns the absolute index of the cursor.
+	int GetCursorIndex() const;
+
 	/// Gets the parent element containing the widget.
 	Core::Element* GetElement();
 
@@ -150,6 +153,11 @@ private:
 	/// @param[in] position The position to query.
 	/// @return The index of the character under the mouse cursor.
 	int CalculateCharacterIndex(int line_index, float position);
+
+	/// Shows or hides the cursor.
+	/// @param[in] show True to show the cursor, false to hide it.
+	/// @param[in] move_to_cursor True to force the cursor to be visible, false to not scroll the widget.
+	void ShowCursor(bool show, bool move_to_cursor = true);
 
 	/// Formats the element, laying out the text and inserting scrollbars as appropriate.
 	void FormatElement();
@@ -224,6 +232,10 @@ private:
 	// Cursor visibility and timings.
 	float cursor_timer;
 	bool cursor_visible;
+	bool keyboard_showed;
+	/// Activate or deactivate keyboard (for touchscreen devices)
+	/// @param[in] active True if need activate keyboard, false if need deactivate.
+	void SetKeyboardActive(bool active);
 
 	float last_update_time;
 

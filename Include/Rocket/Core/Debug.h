@@ -32,12 +32,27 @@
 
 // Define for breakpointing.
 #if defined (ROCKET_PLATFORM_WIN32)
-#define ROCKET_BREAK _asm { int 0x03 }
+	#if defined (__MINGW32__)
+		#define ROCKET_BREAK asm("int $0x03")
+	#else
+		#define ROCKET_BREAK _asm { int 0x03 }
+	#endif
 #elif defined (ROCKET_PLATFORM_LINUX)
-#define ROCKET_BREAK asm ("int $0x03" )
+	#if defined __i386__ || defined __x86_64__
+		#define ROCKET_BREAK asm ("int $0x03" )
+	#else
+		#define ROCKET_BREAK
+	#endif
 #elif defined (ROCKET_PLATFORM_MACOSX)
-#define ROCKET_BREAK _asm { int 0x03 }
+	#include <TargetConditionals.h>
+
+	#if TARGET_OS_IPHONE
+		#define ROCKET_BREAK
+	#else
+		#define ROCKET_BREAK {__asm__("int $3\n" : : );}
+	#endif
 #endif
+
 
 
 // Define the LT_ASSERT and ROCKET_VERIFY macros.

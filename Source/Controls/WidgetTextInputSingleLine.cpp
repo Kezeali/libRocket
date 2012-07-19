@@ -32,8 +32,9 @@
 namespace Rocket {
 namespace Controls {
 
-WidgetTextInputSingleLine::WidgetTextInputSingleLine(ElementFormControl* parent) : WidgetTextInput(parent)
-	: enter_event_enabled(false)
+WidgetTextInputSingleLine::WidgetTextInputSingleLine(ElementFormControl* parent)
+	: WidgetTextInput(parent),
+	enter_event_enabled(false)
 {
 }
 

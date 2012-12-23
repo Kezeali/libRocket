@@ -121,7 +121,7 @@ protected:
 	Core::Element* GetElement();
 
 	/// Dispatches a change event to the widget's element.
-	void DispatchChangeEvent();
+	void DispatchChangeEvent(bool linebreak = false);
 
 	/// Dispatches an enter event to the widget's element.
 	void DispatchEnterEvent();

@@ -52,6 +52,17 @@ if(NOT BUILD_SHARED_LIBS)
     add_definitions(-DSTATIC_LIB)
 endif()
 
+#on windows, check for VC10 and fix the multiple compile target issue.
+IF(WIN32)
+  if(MSVC)
+    if(${MSVC_VERSION} STREQUAL 1600 OR ${MSVC_VERSION} STRGREATER 1600)
+      message("Visual Studio 2010 (${MSVC_VERSION}) build fix at play (/FORCE:MULTIPLE)")
+      set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /FORCE:MULTIPLE")
+    endif()
+  endif() 
+ENDIF(WIN32)
+
+
 #===================================
 # Find dependencies ================
 #===================================
@@ -193,7 +204,9 @@ endmacro()
 
 if(BUILD_SAMPLES)
     include(SampleFileList)
-	set(samples treeview customlog drag loaddocument)
+
+    set(samples treeview customlog drag loaddocument)
+    set(tutorials template datagrid datagrid_tree tutorial_drag)
     
     set(sample_LIBRARIES
     	shell 
@@ -206,8 +219,8 @@ if(BUILD_SAMPLES)
 	find_package(OpenGL REQUIRED)
     	   
     if(OPENGL_FOUND)
-    	include_directories(${OPENGL_INCLUDE_DIR})
-        list(APPEND sample_LIBRARIES ${OPENGL_LIBRARIES})
+	include_directories(${OPENGL_INCLUDE_DIR})
+	list(APPEND sample_LIBRARIES ${OPENGL_LIBRARIES})
     endif()
     
     # Set up required system libraries
@@ -231,7 +244,7 @@ if(BUILD_SAMPLES)
    
     set(SAMPLES_DIR opt/Rocket/Samples)
 
-    # The samples use the shell library
+    # The samples and tutorials use the shell library
     include_directories(${PROJECT_SOURCE_DIR}/Samples/shell/include)
 
     # Build and install sample shell library
@@ -255,6 +268,17 @@ if(BUILD_SAMPLES)
         install(TARGETS ${sample} 
         	RUNTIME DESTINATION ${SAMPLES_DIR}/${sample}
         	BUNDLE DESTINATION ${SAMPLES_DIR})
+    endforeach()
+
+    # Build and install the tutorials
+    foreach(tutorial ${tutorials})
+        bl_sample(${tutorial} ${sample_LIBRARIES})
+
+        # The tutorials always set this as their current working directory
+        install(DIRECTORY DESTINATION ${SAMPLES_DIR}/tutorial/${tutorial})
+        install(TARGETS ${tutorial}
+                RUNTIME DESTINATION ${SAMPLES_DIR}/${tutorial}
+                BUNDLE DESTINATION ${SAMPLES_DIR})
     endforeach()
 
     # Build and install invaders sample
@@ -285,6 +309,18 @@ else()
 endif()
 
 if(BUILD_SAMPLES)
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/Samples/tutorial/template/data
+            DESTINATION ${SAMPLES_DIR}/tutorial/template
+    )
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/Samples/tutorial/datagrid/data
+            DESTINATION ${SAMPLES_DIR}/tutorial/datagrid
+    )
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/Samples/tutorial/datagrid_tree/data
+            DESTINATION ${SAMPLES_DIR}/tutorial/datagrid_tree
+    )
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/Samples/tutorial/tutorial_drag/data
+            DESTINATION ${SAMPLES_DIR}/tutorial/tutorial_drag
+    )
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/Samples/basic/treeview/data
             DESTINATION ${SAMPLES_DIR}/basic/treeview
     )

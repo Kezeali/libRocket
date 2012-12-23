@@ -72,8 +72,7 @@ void WidgetTextInputSingleLine::LineBreak()
 {
 	if (enter_event_enabled)
 		DispatchEnterEvent();
-	else
-		DispatchChangeEvent();
+	DispatchChangeEvent(true);
 }
 
 // Strips all \n and \r characters from the string.

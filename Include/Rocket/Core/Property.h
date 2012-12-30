@@ -31,6 +31,10 @@
 #include <Rocket/Core/Variant.h>
 #include <Rocket/Core/Header.h>
 
+#ifdef IN
+#undef IN
+#endif
+
 namespace Rocket {
 namespace Core {
 

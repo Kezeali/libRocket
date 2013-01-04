@@ -373,7 +373,7 @@ float ElementStyle::ResolveProperty(const String& name, float base_value)
 	{
 		float inch = property->value.Get< float >() * element->GetRenderInterface()->GetPixelsPerInch();
 
-		if (property->unit & Property::IN) // inch
+		if (property->unit & Property::INCH) // inch
 			return inch;
 		if (property->unit & Property::CM) // centimeter
 			return inch / 2.54f;
